@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SmartFinance — Personal Finance Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" class="loading-overlay hidden">
+  <div class="spinner"></div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- ============================================================
+     LANDING PAGE
+     ============================================================ -->
+<div id="landing" class="page">
+  <nav class="nav">
+    <div class="logo">
+      <div class="logo-icon">💰</div>
+      Smart<span>Finance</span>
+    </div>
+    <div class="nav-actions">
+      <button id="gotoAppBtn" class="btn btn-cta">Get Started →</button>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-left">
+      <div class="hero-badge">✦ Personal Finance Dashboard</div>
+      <h1>Take full control of<br/><em>your finances</em></h1>
+      <p class="subtitle">Track income and expenses, set monthly budgets, manage recurring transactions, and visualize your spending — all in one clean, professional dashboard.</p>
+
+      <ul class="features">
+        <li>Add, edit & delete transactions</li>
+        <li>Monthly charts &amp; category breakdown</li>
+        <li>Recurring transaction automation</li>
+        <li>Budget alerts &amp; overspend warnings</li>
+        <li>Backup JSON &amp; Export CSV</li>
+        <li>Multi-currency support</li>
+      </ul>
+
+      <div class="cta-row">
+        <button id="startBtn" class="btn btn-cta">Start Tracking — It's Free</button>
+        <button id="previewBtn" class="btn btn-outline">▶ Interactive Demo</button>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="device-mock">
+        <div class="mock-header">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div class="mock-balance">
+          <div class="label">Net Balance</div>
+          <div class="val" id="mockBalance">₹48,709.25</div>
+        </div>
+        <div class="mock-stats">
+          <div class="mock-stat">
+            <div class="slabel">Income</div>
+            <div class="sval inc">₹50,000</div>
+          </div>
+          <div class="mock-stat">
+            <div class="slabel">Expenses</div>
+            <div class="sval exp">₹1,290.75</div>
+          </div>
+        </div>
+        <div class="mock-recent-header">Recent Transactions</div>
+        <div class="mock-tx">
+          <div class="mt-left">
+            <div class="mock-tx-dot" style="background:#10b981"></div>
+            <div>
+              <div class="mt-desc">Salary</div>
+              <div class="mt-cat">Income · Salary</div>
+            </div>
+          </div>
+          <div class="mt-amt mt-inc">+₹50,000</div>
+        </div>
+        <div class="mock-tx">
+          <div class="mt-left">
+            <div class="mock-tx-dot" style="background:#fb923c"></div>
+            <div>
+              <div class="mt-desc">Groceries</div>
+              <div class="mt-cat">Expense · Food</div>
+            </div>
+          </div>
+          <div class="mt-amt mt-exp">−₹1,250.75</div>
+        </div>
+        <div class="mock-tx">
+          <div class="mt-left">
+            <div class="mock-tx-dot" style="background:#60a5fa"></div>
+            <div>
+              <div class="mt-desc">Bus Pass</div>
+              <div class="mt-cat">Expense · Transport</div>
+            </div>
+          </div>
+          <div class="mt-amt mt-exp">−₹40.00</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="landing-features-bar">
+    <div class="lf-item">
+      <div class="lf-icon">📊</div>
+      <div class="lf-title">Visual Insights</div>
+      <div class="lf-desc">Interactive pie &amp; bar charts for spending patterns</div>
+    </div>
+    <div class="lf-item">
+      <div class="lf-icon">🔁</div>
+      <div class="lf-title">Smart Recurring</div>
+      <div class="lf-desc">Automatic monthly transaction processing</div>
+    </div>
+    <div class="lf-item">
+      <div class="lf-icon">🔔</div>
+      <div class="lf-title">Budget Alerts</div>
+      <div class="lf-desc">Instant warnings when you approach your limit</div>
+    </div>
+    <div class="lf-item">
+      <div class="lf-icon">☁️</div>
+      <div class="lf-title">Cloud Backed</div>
+      <div class="lf-desc">Your data synced securely to the cloud database</div>
+    </div>
+    <div class="lf-item">
+      <div class="lf-icon">📤</div>
+      <div class="lf-title">Export Anytime</div>
+      <div class="lf-desc">Download CSV or backup full JSON easily</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     APP PAGE
+     ============================================================ -->
+<div id="app" class="page hidden">
+  <nav class="nav">
+    <div class="logo">
+      <div class="logo-icon">💰</div>
+      Smart<span>Finance</span>
+    </div>
+    <div class="nav-actions">
+      <select id="currencySel" class="select-small">
+        <option value="INR">₹ INR</option>
+        <option value="USD">$ USD</option>
+        <option value="EUR">€ EUR</option>
+        <option value="GBP">£ GBP</option>
+      </select>
+      <button id="openAdd" class="btn btn-primary" style="display:none">+ Add Transaction</button>
+      <button id="logout" class="btn btn-ghost">Sign Out</button>
+    </div>
+  </nav>
+
+  <main class="container-grid">
+    <!-- ── LEFT COLUMN ── -->
+    <aside class="left-col">
+
+      <!-- Auth / User Card -->
+      <div class="auth-card" id="authSection">
+        <div class="auth-card-title">Sign In</div>
+        <div class="auth-row">
+          <input id="username" placeholder="Enter your username" autocomplete="username" />
+          <button id="login" class="btn btn-primary">Login</button>
+        </div>
+        <div class="auth-hint">Your data is stored per username. Enter the same username to access your data again.</div>
+      </div>
+
+      <div id="userSection" class="hidden">
+        <div class="user-badge">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <div class="user-info">
+            <div class="user-name" id="userNameDisplay">—</div>
+            <div class="user-status">● Active Session</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="summary-cards">
+        <div class="stat-card">
+          <div class="stat-icon balance">💳</div>
+          <div class="stat-content">
+            <div class="stat-label">Net Balance</div>
+            <div id="balance" class="stat-value">₹0.00</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon income">📈</div>
+          <div class="stat-content">
+            <div class="stat-label">Total Income</div>
+            <div id="income" class="stat-value positive">₹0.00</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon expense">📉</div>
+          <div class="stat-content">
+            <div class="stat-label">Total Expenses</div>
+            <div id="expenses" class="stat-value negative">₹0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="actions-card">
+        <div class="actions-header">Quick Actions</div>
+        <div class="actions-grid">
+          <button id="openAddMobile" class="btn btn-primary">＋ Add</button>
+          <button id="sample" class="btn btn-ghost">🎲 Sample Data</button>
+          <button id="backup" class="btn btn-ghost">💾 Backup JSON</button>
+          <button id="importBtn" class="btn btn-ghost">📂 Import JSON</button>
+        </div>
+        <input id="importFile" type="file" accept="application/json" style="display:none" />
+
+        <!-- Budget -->
+        <div class="budget-section">
+          <label>Monthly Budget</label>
+          <div class="budget-row">
+            <input id="budget" type="number" placeholder="e.g. 20000" min="0" />
+            <button id="setBudget" class="btn btn-ghost" style="flex-shrink:0">Set</button>
+          </div>
+          <div class="budget-progress" id="budgetProgress">
+            <div class="budget-progress-label">
+              <span id="budgetSpentLabel">Spent: ₹0</span>
+              <span id="budgetLimitLabel">Budget: ₹0</span>
+            </div>
+            <div class="budget-bar">
+              <div class="budget-bar-fill" id="budgetBarFill" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerts -->
+        <div id="alerts" style="margin-top:10px"></div>
+      </div>
+
+      <!-- Recurring Transactions -->
+      <div class="recurring-card">
+        <div class="card-header">
+          <span class="card-title">🔁 Recurring</span>
+          <span id="recCount" class="tx-count">0</span>
+        </div>
+        <div id="recList">
+          <div class="empty-state" style="padding:16px 8px">
+            <div class="empty-desc">No recurring transactions yet.</div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ── RIGHT COLUMN ── -->
+    <section class="right-col">
+
+      <!-- Filter Bar -->
+      <div class="filter-card">
+        <div class="filter-card-header">
+          <span class="card-title" style="text-transform:uppercase;letter-spacing:.06em;font-size:12px;font-weight:600;color:var(--text-muted)">Filters</span>
+        </div>
+        <div class="filters">
+          <input id="search" placeholder="🔍 Search description or category..." style="flex:2;min-width:200px" />
+          <input id="from" type="date" title="From date" />
+          <input id="to" type="date" title="To date" />
+          <select id="catFilter">
+            <option value="all">All Categories</option>
+            <option value="general">General</option>
+            <option value="food">Food</option>
+            <option value="transport">Transport</option>
+            <option value="salary">Salary</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="utilities">Utilities</option>
+            <option value="health">Health</option>
+          </select>
+          <select id="typeFilter">
+            <option value="all">All Types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+          <div class="filter-actions">
+            <button id="apply" class="btn btn-primary" style="padding:8px 16px">Apply</button>
+            <button id="clear" class="btn btn-ghost" style="padding:8px 14px">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transaction Table -->
+      <div class="table-card">
+        <div class="table-card-header">
+          <span class="table-card-title">Transactions</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span id="txCount" class="tx-count">0 entries</span>
+            <button id="exportCSV" class="btn btn-ghost export-btn">📤 Export CSV</button>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table id="txTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th style="text-align:right">Amount</th>
+                <th style="text-align:right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="txTableBody"></tbody>
+          </table>
+          <div id="emptyState" class="empty-state hidden">
+            <div class="empty-icon">📋</div>
+            <div class="empty-title">No transactions found</div>
+            <div class="empty-desc">Add a transaction or adjust your filters to see results.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-row">
+        <div class="chart-wrap">
+          <div class="chart-title">Expenses by Category</div>
+          <div class="chart-container"><canvas id="catChart"></canvas></div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-title">Monthly Income vs Expenses</div>
+          <div class="chart-container"><canvas id="monthChart"></canvas></div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    SmartFinance — Personal Finance Tracker &nbsp;·&nbsp; Made with ❤️ by Akansha
+  </footer>
+</div>
+
+<!-- ============================================================
+     ADD / EDIT MODAL
+     ============================================================ -->
+<div id="modal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 id="modalTitle">Add Transaction</h3>
+      <button class="modal-close" id="cancelX" title="Close">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="txForm" autocomplete="off">
+        <div class="form-row">
+          <div class="form-group" style="margin:0">
+            <label>Date</label>
+            <input id="m_date" type="date" required />
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Description</label>
+            <input id="m_desc" placeholder="e.g. Groceries, Salary…" required />
+          </div>
+        </div>
+        <div class="form-row triple">
+          <div class="form-group" style="margin:0">
+            <label>Amount</label>
+            <input id="m_amount" type="number" step="0.01" min="0" placeholder="0.00" required />
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Type</label>
+            <select id="m_type">
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Category</label>
+            <select id="m_category">
+              <option value="general">General</option>
+              <option value="food">Food</option>
+              <option value="transport">Transport</option>
+              <option value="salary">Salary</option>
+              <option value="entertainment">Entertainment</option>
+              <option value="utilities">Utilities</option>
+              <option value="health">Health</option>
+            </select>
+          </div>
+        </div>
+        <label class="form-check">
+          <input id="m_rec" type="checkbox" />
+          <span>🔁 Mark as recurring monthly transaction</span>
+        </label>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button id="cancel" type="button" class="btn btn-ghost">Cancel</button>
+      <button id="saveBtn" type="submit" form="txForm" class="btn btn-primary">Save Transaction</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     DEMO TOUR OVERLAY
+     ============================================================ -->
+<div id="demoOverlay" class="demo-overlay hidden">
+  <div class="demo-backdrop"></div>
+  <div class="demo-tooltip" id="demoTooltip">
+    <div class="demo-step-badge" id="demoStepBadge">Step 1 of 7</div>
+    <div class="demo-icon" id="demoIcon">🔐</div>
+    <h3 class="demo-title" id="demoTitle">Login karo</h3>
+    <p class="demo-desc" id="demoDesc">Apna username enter karo aur Login dabao. Koi password nahi chahiye — sirf naam kaafi hai!</p>
+    <div class="demo-nav">
+      <button class="demo-btn-skip" id="demoSkip">✕ Skip Demo</button>
+      <div class="demo-nav-right">
+        <button class="demo-btn-prev hidden" id="demoPrev">← Prev</button>
+        <button class="demo-btn-next" id="demoNext">Next →</button>
+      </div>
+    </div>
+    <div class="demo-dots" id="demoDots"></div>
+  </div>
+  <div class="demo-highlight" id="demoHighlight"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
